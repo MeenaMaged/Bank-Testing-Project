@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banking System - Client Dashboard</title>
+    <style>
+        * { box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { max-width: 600px; margin: 40px auto; padding: 20px; background: #f5f5f5; }
+        .panel { background: white; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+        .panel h2 { margin-top: 0; color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #555; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .form-group input:disabled { background: #e9ecef; }
+        .status { padding: 8px 16px; border-radius: 4px; font-weight: bold; display: inline-block; }
+        .status-verified { background: #d4edda; color: #155724; }
+        .status-suspended { background: #fff3cd; color: #856404; }
+        .status-closed { background: #f8d7da; color: #721c24; }
+        .status-unverified { background: #cce5ff; color: #004085; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn { padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-info { background: #17a2b8; color: white; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        #notification { padding: 15px; border-radius: 4px; margin-top: 15px; display: none; }
+        .notification-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .notification-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .amount-input { display: flex; align-items: center; gap: 10px; }
+        .amount-input span { font-size: 18px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="panel">
+        <h2>Client Account</h2>
+        <div class="form-group">
+            <label for="clientName">Client Name:</label>
+            <input type="text" id="clientName" value="John Doe" disabled>
+        </div>
+        <div class="form-group">
+            <label for="accountNumber">Account Number:</label>
+            <input type="text" id="accountNumber" value="0001 0001 0001 0001" disabled>
+        </div>
+        <div class="form-group">
+            <label for="balance">Balance:</label>
+            <input type="text" id="balance" value="$1000.00" disabled>
+        </div>
+        <div class="form-group">
+            <label>Status:</label>
+            <span id="statusLabel" class="status status-verified">Verified</span>
+        </div>
+    </div>
+    <div class="panel">
+        <h2>Operations</h2>
+        <div class="form-group">
+            <label for="amount">Amount:</label>
+            <div class="amount-input">
+                <span>$</span>
+                <input type="number" id="amount" placeholder="Enter amount" min="0.01" step="0.01">
+            </div>
+        </div>
+        <div class="btn-group">
+            <button id="depositBtn" class="btn btn-success" onclick="handleDeposit()">Deposit</button>
+            <button id="withdrawBtn" class="btn btn-primary" onclick="handleWithdraw()">Withdraw</button>
+            <button id="transferBtn" class="btn btn-warning" onclick="handleTransfer()">Transfer</button>
+            <button id="viewStatementBtn" class="btn btn-info" onclick="handleViewStatement()">View Statement</button>
+        </div>
+        <div id="notification"></div>
+    </div>
+    <div class="panel">
+        <h2>Account Status Control (Testing)</h2>
+        <div class="btn-group">
+            <button id="setVerifiedBtn" class="btn btn-success" onclick="setStatus('Verified')">Set Verified</button>
+            <button id="setSuspendedBtn" class="btn btn-warning" onclick="setStatus('Suspended')">Set Suspended</button>
+            <button id="setUnverifiedBtn" class="btn btn-primary" onclick="setStatus('Unverified')">Set Unverified</button>
+            <button id="setClosedBtn" class="btn" style="background:#dc3545;color:white;" onclick="setStatus('Closed')">Set Closed</button>
+        </div>
+    </div>
+    <script>
+        let balance = 1000.00;
+        let status = 'Verified';
+        function showNotification(message, isSuccess) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = isSuccess ? 'notification-success' : 'notification-error';
+            notification.style.display = 'block';
+        }
+        function updateBalance() {
+            document.getElementById('balance').value = '$' + balance.toFixed(2);
+        }
+        function getAmount() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            if (isNaN(amount) || amount <= 0) {
+                showNotification('Please enter a valid amount', false);
+                return null;
+            }
+            return amount;
+        }
+        function handleDeposit() {
+            if (status === 'Closed') {
+                showNotification('Deposit failed: Account is closed', false);
+                return;
+            }
+            const amount = getAmount();
+            if (amount) {
+                balance += amount;
+                updateBalance();
+                showNotification('Deposit successful: $' + amount.toFixed(2), true);
+                document.getElementById('amount').value = '';
+            }
+        }
+        function handleWithdraw() {
+            if (status !== 'Verified') {
+                showNotification('Withdrawal failed: Account must be verified', false);
+                return;
+            }
+            const amount = getAmount();
+            if (amount) {
+                if (amount > balance) {
+                    showNotification('Withdrawal failed: Insufficient funds', false);
+                } else {
+                    balance -= amount;
+                    updateBalance();
+                    showNotification('Withdrawal successful: $' + amount.toFixed(2), true);
+                    document.getElementById('amount').value = '';
+                }
+            }
+        }
+        function handleTransfer() {
+            if (status !== 'Verified') {
+                showNotification('Transfer failed: Account must be verified', false);
+                return;
+            }
+            const amount = getAmount();
+            if (amount) {
+                if (amount > balance) {
+                    showNotification('Transfer failed: Insufficient funds', false);
+                } else {
+                    balance -= amount;
+                    updateBalance();
+                    showNotification('Transfer successful: $' + amount.toFixed(2), true);
+                    document.getElementById('amount').value = '';
+                }
+            }
+        }
+        function handleViewStatement() {
+            showNotification('Statement viewed successfully', true);
+        }
+        function setStatus(newStatus) {
+            status = newStatus;
+            const statusLabel = document.getElementById('statusLabel');
+            statusLabel.textContent = status;
+            statusLabel.className = 'status status-' + status.toLowerCase();
+            const depositBtn = document.getElementById('depositBtn');
+            const withdrawBtn = document.getElementById('withdrawBtn');
+            const transferBtn = document.getElementById('transferBtn');
+            switch(status) {
+                case 'Verified':
+                    depositBtn.disabled = false;
+                    withdrawBtn.disabled = false;
+                    transferBtn.disabled = false;
+                    break;
+                case 'Suspended':
+                case 'Unverified':
+                    depositBtn.disabled = false;
+                    withdrawBtn.disabled = true;
+                    transferBtn.disabled = true;
+                    break;
+                case 'Closed':
+                    depositBtn.disabled = true;
+                    withdrawBtn.disabled = true;
+                    transferBtn.disabled = true;
+                    break;
+            }
+            showNotification('Status changed to: ' + status, true);
+        }
+    </script>
+</body>
+</html>

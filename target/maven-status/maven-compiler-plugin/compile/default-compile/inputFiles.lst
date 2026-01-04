@@ -1,0 +1,7 @@
+/Users/muhammadmohyeldeen/Bank Testing project/src/main/java/com/banking/controllers/ClientController.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/main/java/com/banking/dao/AccountDAO.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/main/java/com/banking/entities/Account.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/main/java/com/banking/entities/CreditScoreAccount.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/main/java/com/banking/gui/BankingGUI.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/main/java/com/banking/services/AccountService.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/main/java/com/banking/services/TransactionService.java

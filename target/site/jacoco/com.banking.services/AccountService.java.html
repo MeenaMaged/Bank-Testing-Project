@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccountService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Banking System Testing Project</a> &gt; <a href="index.source.html" class="el_package">com.banking.services</a> &gt; <span class="el_source">AccountService.java</span></div><h1>AccountService.java</h1><pre class="source lang-java linenums">package com.banking.services;
+
+import com.banking.dao.AccountDAO;
+import com.banking.entities.Account;
+import com.banking.entities.Account.AccountStatus;
+
+/**
+ * Service class for account management
+ */
+<span class="fc" id="L10">public class AccountService {</span>
+    
+    /**
+     * Create new account
+     * @param id Account ID
+     * @param clientName Client name
+     * @param initialBalance Initial balance
+     * @return Created account
+     */
+    public Account createAccount(int id, String clientName, double initialBalance) {
+<span class="fc" id="L20">        Account account = new Account(id, clientName, initialBalance);</span>
+<span class="fc" id="L21">        AccountDAO.add(account);</span>
+<span class="fc" id="L22">        return account;</span>
+    }
+    
+    /**
+     * Get account by ID
+     * @param id Account ID
+     * @return Account or null
+     */
+    public Account getAccount(int id) {
+<span class="nc" id="L31">        return AccountDAO.findById(id);</span>
+    }
+    
+    /**
+     * Generate account statement
+     * @param account Account
+     * @return Statement string
+     */
+    public String generateStatement(Account account) {
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (account == null) {</span>
+<span class="nc" id="L41">            return &quot;Account not found&quot;;</span>
+        }
+        
+<span class="fc" id="L44">        StringBuilder sb = new StringBuilder();</span>
+<span class="fc" id="L45">        sb.append(&quot;=== ACCOUNT STATEMENT ===\n&quot;);</span>
+<span class="fc" id="L46">        sb.append(&quot;Client Name: &quot;).append(account.getClientName()).append(&quot;\n&quot;);</span>
+<span class="fc" id="L47">        sb.append(&quot;Card Number: &quot;).append(account.getCardNumber()).append(&quot;\n&quot;);</span>
+<span class="fc" id="L48">        sb.append(&quot;Balance: $&quot;).append(String.format(&quot;%.2f&quot;, account.getBalance())).append(&quot;\n&quot;);</span>
+<span class="fc" id="L49">        sb.append(&quot;Status: &quot;).append(account.getStatus()).append(&quot;\n&quot;);</span>
+<span class="fc" id="L50">        sb.append(&quot;========================\n&quot;);</span>
+        
+<span class="fc" id="L52">        return sb.toString();</span>
+    }
+    
+    /**
+     * Check if operation is allowed for account
+     * @param account Account
+     * @param operation Operation type
+     * @return true if allowed
+     */
+    public boolean isOperationAllowed(Account account, String operation) {
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (account == null) {</span>
+<span class="nc" id="L63">            return false;</span>
+        }
+        
+<span class="fc" id="L66">        AccountStatus status = account.getStatus();</span>
+        
+<span class="pc bpc" id="L68" title="2 of 4 branches missed.">        switch (operation.toLowerCase()) {</span>
+            case &quot;deposit&quot;:
+<span class="pc bpc" id="L70" title="1 of 2 branches missed.">                return status != AccountStatus.Closed;</span>
+            case &quot;withdraw&quot;:
+            case &quot;transfer&quot;:
+<span class="fc bfc" id="L73" title="All 2 branches covered.">                return status == AccountStatus.Verified;</span>
+            case &quot;view&quot;:
+<span class="nc" id="L75">                return true;</span>
+            default:
+<span class="nc" id="L77">                return false;</span>
+        }
+    }
+    
+    /**
+     * Verify account (admin action)
+     * @param id Account ID
+     * @return true if successful
+     */
+    public boolean verifyAccount(int id) {
+<span class="nc" id="L87">        Account account = AccountDAO.findById(id);</span>
+<span class="nc bnc" id="L88" title="All 4 branches missed.">        return account != null &amp;&amp; account.verify();</span>
+    }
+    
+    /**
+     * Suspend account (admin action)
+     * @param id Account ID
+     * @return true if successful
+     */
+    public boolean suspendAccount(int id) {
+<span class="nc" id="L97">        Account account = AccountDAO.findById(id);</span>
+<span class="nc bnc" id="L98" title="All 4 branches missed.">        return account != null &amp;&amp; account.suspend();</span>
+    }
+    
+    /**
+     * Close account (admin action)
+     * @param id Account ID
+     * @return true if successful
+     */
+    public boolean closeAccount(int id) {
+<span class="nc" id="L107">        Account account = AccountDAO.findById(id);</span>
+<span class="nc bnc" id="L108" title="All 4 branches missed.">        return account != null &amp;&amp; account.close();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

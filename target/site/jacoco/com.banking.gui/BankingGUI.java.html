@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BankingGUI.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Banking System Testing Project</a> &gt; <a href="index.source.html" class="el_package">com.banking.gui</a> &gt; <span class="el_source">BankingGUI.java</span></div><h1>BankingGUI.java</h1><pre class="source lang-java linenums">package com.banking.gui;
+
+import com.banking.controllers.ClientController;
+import com.banking.dao.AccountDAO;
+import com.banking.entities.Account;
+import com.banking.entities.Account.AccountStatus;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ * GUI interface for the banking system
+ * Matches the design shown in the project specification
+ */
+public class BankingGUI extends JFrame {
+    
+    private ClientController controller;
+    private Account currentAccount;
+    
+    // Account Info Fields
+    private JTextField clientNameField;
+    private JTextField accountNumberField;
+    private JTextField balanceField;
+    private JLabel statusLabel;
+    
+    // Operation Buttons
+    private JButton depositButton;
+    private JButton withdrawButton;
+    private JButton transferButton;
+    private JButton viewStatementButton;
+    
+    // Input and Notification
+    private JTextField amountField;
+    private JTextArea notificationArea;
+    
+<span class="nc" id="L39">    public BankingGUI() {</span>
+<span class="nc" id="L40">        controller = new ClientController();</span>
+<span class="nc" id="L41">        initializeGUI();</span>
+<span class="nc" id="L42">        createSampleAccount();</span>
+<span class="nc" id="L43">    }</span>
+    
+    private void initializeGUI() {
+<span class="nc" id="L46">        setTitle(&quot;Banking System - Client Dashboard&quot;);</span>
+<span class="nc" id="L47">        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);</span>
+<span class="nc" id="L48">        setLayout(new BorderLayout(10, 10));</span>
+        
+        // Create panels
+<span class="nc" id="L51">        JPanel accountPanel = createAccountPanel();</span>
+<span class="nc" id="L52">        JPanel operationsPanel = createOperationsPanel();</span>
+<span class="nc" id="L53">        JPanel notificationPanel = createNotificationPanel();</span>
+        
+        // Add panels to frame
+<span class="nc" id="L56">        add(accountPanel, BorderLayout.NORTH);</span>
+<span class="nc" id="L57">        add(operationsPanel, BorderLayout.CENTER);</span>
+<span class="nc" id="L58">        add(notificationPanel, BorderLayout.SOUTH);</span>
+        
+        // Set frame properties
+<span class="nc" id="L61">        pack();</span>
+<span class="nc" id="L62">        setMinimumSize(new Dimension(450, 400));</span>
+<span class="nc" id="L63">        setLocationRelativeTo(null);</span>
+<span class="nc" id="L64">    }</span>
+    
+    private JPanel createAccountPanel() {
+<span class="nc" id="L67">        JPanel panel = new JPanel(new GridBagLayout());</span>
+<span class="nc" id="L68">        panel.setBorder(BorderFactory.createTitledBorder(&quot;Client Account&quot;));</span>
+        
+<span class="nc" id="L70">        GridBagConstraints gbc = new GridBagConstraints();</span>
+<span class="nc" id="L71">        gbc.insets = new Insets(5, 10, 5, 10);</span>
+<span class="nc" id="L72">        gbc.anchor = GridBagConstraints.WEST;</span>
+        
+        // Client Name
+<span class="nc" id="L75">        gbc.gridx = 0; gbc.gridy = 0;</span>
+<span class="nc" id="L76">        panel.add(new JLabel(&quot;Client Name:&quot;), gbc);</span>
+<span class="nc" id="L77">        gbc.gridx = 1;</span>
+<span class="nc" id="L78">        clientNameField = new JTextField(15);</span>
+<span class="nc" id="L79">        clientNameField.setEditable(false);</span>
+<span class="nc" id="L80">        panel.add(clientNameField, gbc);</span>
+        
+        // Account Number
+<span class="nc" id="L83">        gbc.gridx = 0; gbc.gridy = 1;</span>
+<span class="nc" id="L84">        panel.add(new JLabel(&quot;Account Number:&quot;), gbc);</span>
+<span class="nc" id="L85">        gbc.gridx = 1;</span>
+<span class="nc" id="L86">        accountNumberField = new JTextField(15);</span>
+<span class="nc" id="L87">        accountNumberField.setEditable(false);</span>
+<span class="nc" id="L88">        panel.add(accountNumberField, gbc);</span>
+        
+        // Balance
+<span class="nc" id="L91">        gbc.gridx = 0; gbc.gridy = 2;</span>
+<span class="nc" id="L92">        panel.add(new JLabel(&quot;Balance:&quot;), gbc);</span>
+<span class="nc" id="L93">        gbc.gridx = 1;</span>
+<span class="nc" id="L94">        balanceField = new JTextField(15);</span>
+<span class="nc" id="L95">        balanceField.setEditable(false);</span>
+<span class="nc" id="L96">        panel.add(balanceField, gbc);</span>
+        
+        // Status
+<span class="nc" id="L99">        gbc.gridx = 0; gbc.gridy = 3;</span>
+<span class="nc" id="L100">        panel.add(new JLabel(&quot;Status:&quot;), gbc);</span>
+<span class="nc" id="L101">        gbc.gridx = 1;</span>
+<span class="nc" id="L102">        statusLabel = new JLabel(&quot;Verified&quot;);</span>
+<span class="nc" id="L103">        statusLabel.setFont(statusLabel.getFont().deriveFont(Font.BOLD));</span>
+<span class="nc" id="L104">        panel.add(statusLabel, gbc);</span>
+        
+<span class="nc" id="L106">        return panel;</span>
+    }
+    
+    private JPanel createOperationsPanel() {
+<span class="nc" id="L110">        JPanel panel = new JPanel(new GridBagLayout());</span>
+<span class="nc" id="L111">        panel.setBorder(BorderFactory.createTitledBorder(&quot;Operations&quot;));</span>
+        
+<span class="nc" id="L113">        GridBagConstraints gbc = new GridBagConstraints();</span>
+<span class="nc" id="L114">        gbc.insets = new Insets(5, 5, 5, 5);</span>
+<span class="nc" id="L115">        gbc.fill = GridBagConstraints.HORIZONTAL;</span>
+        
+        // Amount input
+<span class="nc" id="L118">        gbc.gridx = 0; gbc.gridy = 0;</span>
+<span class="nc" id="L119">        gbc.gridwidth = 2;</span>
+<span class="nc" id="L120">        JPanel amountPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));</span>
+<span class="nc" id="L121">        amountPanel.add(new JLabel(&quot;Amount: $&quot;));</span>
+<span class="nc" id="L122">        amountField = new JTextField(10);</span>
+<span class="nc" id="L123">        amountPanel.add(amountField);</span>
+<span class="nc" id="L124">        panel.add(amountPanel, gbc);</span>
+        
+        // Buttons row 1
+<span class="nc" id="L127">        gbc.gridwidth = 1;</span>
+<span class="nc" id="L128">        gbc.gridx = 0; gbc.gridy = 1;</span>
+<span class="nc" id="L129">        depositButton = new JButton(&quot;Deposit&quot;);</span>
+<span class="nc" id="L130">        depositButton.addActionListener(e -&gt; handleDeposit());</span>
+<span class="nc" id="L131">        panel.add(depositButton, gbc);</span>
+        
+<span class="nc" id="L133">        gbc.gridx = 1;</span>
+<span class="nc" id="L134">        withdrawButton = new JButton(&quot;Withdraw&quot;);</span>
+<span class="nc" id="L135">        withdrawButton.addActionListener(e -&gt; handleWithdraw());</span>
+<span class="nc" id="L136">        panel.add(withdrawButton, gbc);</span>
+        
+        // Buttons row 2
+<span class="nc" id="L139">        gbc.gridx = 0; gbc.gridy = 2;</span>
+<span class="nc" id="L140">        transferButton = new JButton(&quot;Transfer&quot;);</span>
+<span class="nc" id="L141">        transferButton.addActionListener(e -&gt; handleTransfer());</span>
+<span class="nc" id="L142">        panel.add(transferButton, gbc);</span>
+        
+<span class="nc" id="L144">        gbc.gridx = 1;</span>
+<span class="nc" id="L145">        viewStatementButton = new JButton(&quot;View Statement&quot;);</span>
+<span class="nc" id="L146">        viewStatementButton.addActionListener(e -&gt; handleViewStatement());</span>
+<span class="nc" id="L147">        panel.add(viewStatementButton, gbc);</span>
+        
+<span class="nc" id="L149">        return panel;</span>
+    }
+    
+    private JPanel createNotificationPanel() {
+<span class="nc" id="L153">        JPanel panel = new JPanel(new BorderLayout());</span>
+<span class="nc" id="L154">        panel.setBorder(BorderFactory.createTitledBorder(&quot;Notifications&quot;));</span>
+        
+<span class="nc" id="L156">        notificationArea = new JTextArea(5, 40);</span>
+<span class="nc" id="L157">        notificationArea.setEditable(false);</span>
+<span class="nc" id="L158">        notificationArea.setBackground(new Color(240, 240, 240));</span>
+<span class="nc" id="L159">        notificationArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));</span>
+        
+<span class="nc" id="L161">        JScrollPane scrollPane = new JScrollPane(notificationArea);</span>
+<span class="nc" id="L162">        panel.add(scrollPane, BorderLayout.CENTER);</span>
+        
+<span class="nc" id="L164">        return panel;</span>
+    }
+    
+    private void createSampleAccount() {
+        // Create sample account matching the PDF example
+<span class="nc" id="L169">        currentAccount = controller.createAccount(1, &quot;John Doe&quot;, 1000.0);</span>
+<span class="nc" id="L170">        currentAccount.verify();</span>
+<span class="nc" id="L171">        updateGUI();</span>
+<span class="nc" id="L172">        addNotification(&quot;Account created and verified successfully&quot;);</span>
+<span class="nc" id="L173">    }</span>
+    
+    private void updateGUI() {
+<span class="nc bnc" id="L176" title="All 2 branches missed.">        if (currentAccount != null) {</span>
+<span class="nc" id="L177">            clientNameField.setText(currentAccount.getClientName());</span>
+<span class="nc" id="L178">            accountNumberField.setText(currentAccount.getCardNumber());</span>
+<span class="nc" id="L179">            balanceField.setText(String.format(&quot;$%.2f&quot;, currentAccount.getBalance()));</span>
+            
+<span class="nc" id="L181">            AccountStatus status = currentAccount.getStatus();</span>
+<span class="nc" id="L182">            statusLabel.setText(status.toString());</span>
+            
+            // Update status color based on state
+<span class="nc bnc" id="L185" title="All 4 branches missed.">            switch (status) {</span>
+                case Verified:
+<span class="nc" id="L187">                    statusLabel.setForeground(new Color(0, 128, 0)); // Green</span>
+<span class="nc" id="L188">                    break;</span>
+                case Suspended:
+<span class="nc" id="L190">                    statusLabel.setForeground(Color.ORANGE);</span>
+<span class="nc" id="L191">                    break;</span>
+                case Closed:
+<span class="nc" id="L193">                    statusLabel.setForeground(Color.RED);</span>
+<span class="nc" id="L194">                    break;</span>
+                default:
+<span class="nc" id="L196">                    statusLabel.setForeground(Color.BLUE);</span>
+            }
+            
+<span class="nc" id="L199">            updateButtonStates();</span>
+        }
+<span class="nc" id="L201">    }</span>
+    
+    private void updateButtonStates() {
+<span class="nc" id="L204">        AccountStatus status = currentAccount.getStatus();</span>
+        
+        // Button states based on account status (as per PDF requirements)
+<span class="nc bnc" id="L207" title="All 2 branches missed.">        depositButton.setEnabled(status != AccountStatus.Closed);</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        withdrawButton.setEnabled(status == AccountStatus.Verified);</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">        transferButton.setEnabled(status == AccountStatus.Verified);</span>
+<span class="nc" id="L210">        viewStatementButton.setEnabled(true); // Always enabled</span>
+<span class="nc" id="L211">    }</span>
+    
+    private void addNotification(String message) {
+<span class="nc" id="L214">        SimpleDateFormat sdf = new SimpleDateFormat(&quot;HH:mm:ss&quot;);</span>
+<span class="nc" id="L215">        String timestamp = sdf.format(new Date());</span>
+<span class="nc" id="L216">        notificationArea.append(timestamp + &quot;: &quot; + message + &quot;\n&quot;);</span>
+<span class="nc" id="L217">        notificationArea.setCaretPosition(notificationArea.getDocument().getLength());</span>
+<span class="nc" id="L218">    }</span>
+    
+    private void handleDeposit() {
+        try {
+<span class="nc" id="L222">            double amount = parseAmount();</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">            if (amount &lt;= 0) {</span>
+<span class="nc" id="L224">                addNotification(&quot;Invalid amount entered&quot;);</span>
+<span class="nc" id="L225">                return;</span>
+            }
+            
+<span class="nc" id="L228">            String result = controller.processDeposit(currentAccount, amount);</span>
+<span class="nc" id="L229">            addNotification(result);</span>
+<span class="nc" id="L230">            updateGUI();</span>
+<span class="nc" id="L231">            amountField.setText(&quot;&quot;);</span>
+<span class="nc" id="L232">        } catch (NumberFormatException ex) {</span>
+<span class="nc" id="L233">            addNotification(&quot;Invalid amount entered&quot;);</span>
+<span class="nc" id="L234">        }</span>
+<span class="nc" id="L235">    }</span>
+    
+    private void handleWithdraw() {
+        try {
+<span class="nc" id="L239">            double amount = parseAmount();</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">            if (amount &lt;= 0) {</span>
+<span class="nc" id="L241">                addNotification(&quot;Invalid amount entered&quot;);</span>
+<span class="nc" id="L242">                return;</span>
+            }
+            
+<span class="nc" id="L245">            String result = controller.processWithdrawal(currentAccount, amount);</span>
+<span class="nc" id="L246">            addNotification(result);</span>
+<span class="nc" id="L247">            updateGUI();</span>
+<span class="nc" id="L248">            amountField.setText(&quot;&quot;);</span>
+<span class="nc" id="L249">        } catch (NumberFormatException ex) {</span>
+<span class="nc" id="L250">            addNotification(&quot;Invalid amount entered&quot;);</span>
+<span class="nc" id="L251">        }</span>
+<span class="nc" id="L252">    }</span>
+    
+    private void handleTransfer() {
+        try {
+<span class="nc" id="L256">            double amount = parseAmount();</span>
+<span class="nc bnc" id="L257" title="All 2 branches missed.">            if (amount &lt;= 0) {</span>
+<span class="nc" id="L258">                addNotification(&quot;Invalid amount entered&quot;);</span>
+<span class="nc" id="L259">                return;</span>
+            }
+            
+            // For demo: create a target account
+<span class="nc" id="L263">            String targetCard = JOptionPane.showInputDialog(this, </span>
+                &quot;Enter recipient card number:&quot;, 
+                &quot;Transfer&quot;, 
+                JOptionPane.QUESTION_MESSAGE);
+            
+<span class="nc bnc" id="L268" title="All 4 branches missed.">            if (targetCard != null &amp;&amp; !targetCard.trim().isEmpty()) {</span>
+<span class="nc" id="L269">                String result = controller.processTransfer(currentAccount, targetCard, amount, &quot;GUI Transfer&quot;);</span>
+<span class="nc" id="L270">                addNotification(result);</span>
+<span class="nc" id="L271">                updateGUI();</span>
+<span class="nc" id="L272">                amountField.setText(&quot;&quot;);</span>
+            }
+<span class="nc" id="L274">        } catch (NumberFormatException ex) {</span>
+<span class="nc" id="L275">            addNotification(&quot;Invalid amount entered&quot;);</span>
+<span class="nc" id="L276">        }</span>
+<span class="nc" id="L277">    }</span>
+    
+    private void handleViewStatement() {
+<span class="nc" id="L280">        String statement = controller.getAccountStatement(currentAccount);</span>
+<span class="nc" id="L281">        JOptionPane.showMessageDialog(this, statement, &quot;Account Statement&quot;, JOptionPane.INFORMATION_MESSAGE);</span>
+<span class="nc" id="L282">        addNotification(&quot;Statement viewed&quot;);</span>
+<span class="nc" id="L283">    }</span>
+    
+    private double parseAmount() throws NumberFormatException {
+<span class="nc" id="L286">        String text = amountField.getText().trim();</span>
+<span class="nc bnc" id="L287" title="All 2 branches missed.">        if (text.isEmpty()) {</span>
+<span class="nc" id="L288">            throw new NumberFormatException(&quot;Empty input&quot;);</span>
+        }
+<span class="nc" id="L290">        return Double.parseDouble(text);</span>
+    }
+    
+    public static void main(String[] args) {
+<span class="nc" id="L294">        SwingUtilities.invokeLater(() -&gt; {</span>
+            try {
+<span class="nc" id="L296">                UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());</span>
+<span class="nc" id="L297">            } catch (Exception e) {</span>
+<span class="nc" id="L298">                e.printStackTrace();</span>
+<span class="nc" id="L299">            }</span>
+<span class="nc" id="L300">            new BankingGUI().setVisible(true);</span>
+<span class="nc" id="L301">        });</span>
+<span class="nc" id="L302">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

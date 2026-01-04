@@ -1,0 +1,7 @@
+/Users/muhammadmohyeldeen/Bank Testing project/src/test/java/com/banking/blackbox/AccountBlackBoxTest.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/test/java/com/banking/integration/IntegrationTest.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/test/java/com/banking/state/AccountStateTest.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/test/java/com/banking/tdd/CreditScoreGreenPhaseTest.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/test/java/com/banking/tdd/CreditScoreTest.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/test/java/com/banking/ui/GUIComponentTest.java
+/Users/muhammadmohyeldeen/Bank Testing project/src/test/java/com/banking/whitebox/TransactionServiceWhiteBoxTest.java

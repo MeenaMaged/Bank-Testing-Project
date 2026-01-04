@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Account.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Banking System Testing Project</a> &gt; <a href="index.source.html" class="el_package">com.banking.entities</a> &gt; <span class="el_source">Account.java</span></div><h1>Account.java</h1><pre class="source lang-java linenums">package com.banking.entities;
+
+import com.banking.dao.AccountDAO;
+
+/**
+ * Account entity representing a client bank account with state-based behavior
+ */
+public class Account {
+    
+<span class="fc" id="L10">    public enum AccountStatus {</span>
+<span class="fc" id="L11">        Unverified,</span>
+<span class="fc" id="L12">        Verified,</span>
+<span class="fc" id="L13">        Suspended,</span>
+<span class="fc" id="L14">        Closed</span>
+    }
+    
+    private int id;
+    private String clientName;
+    private String cardNumber;
+    private double balance;
+    private AccountStatus status;
+    
+<span class="fc" id="L23">    public Account(int id) {</span>
+<span class="fc" id="L24">        this.id = id;</span>
+<span class="fc" id="L25">        this.cardNumber = generateCardNumber(id);</span>
+<span class="fc" id="L26">        this.balance = 0;</span>
+<span class="fc" id="L27">        this.status = AccountStatus.Unverified;</span>
+<span class="fc" id="L28">    }</span>
+    
+<span class="fc" id="L30">    public Account(int id, String clientName, double initialBalance) {</span>
+<span class="fc" id="L31">        this.id = id;</span>
+<span class="fc" id="L32">        this.clientName = clientName;</span>
+<span class="fc" id="L33">        this.cardNumber = generateCardNumber(id);</span>
+<span class="fc" id="L34">        this.balance = initialBalance;</span>
+<span class="fc" id="L35">        this.status = AccountStatus.Unverified;</span>
+<span class="fc" id="L36">    }</span>
+    
+    private String generateCardNumber(int id) {
+<span class="fc" id="L39">        return String.format(&quot;%04d %04d %04d %04d&quot;, id, id, id, id);</span>
+    }
+    
+    /**
+     * Deposit money into account
+     * @param amount Amount to deposit
+     * @return true if successful, false otherwise
+     */
+    public boolean deposit(double amount) {
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (status == AccountStatus.Closed) {</span>
+<span class="fc" id="L49">            return false;</span>
+        }
+<span class="fc bfc" id="L51" title="All 2 branches covered.">        if (amount &lt;= 0) {</span>
+<span class="fc" id="L52">            return false;</span>
+        }
+<span class="fc" id="L54">        balance += amount;</span>
+<span class="fc" id="L55">        return true;</span>
+    }
+    
+    /**
+     * Withdraw money from account
+     * @param amount Amount to withdraw
+     * @return true if successful, false otherwise
+     */
+    public boolean withdraw(double amount) {
+<span class="fc bfc" id="L64" title="All 4 branches covered.">        if (status == AccountStatus.Closed || status == AccountStatus.Suspended) {</span>
+<span class="fc" id="L65">            return false;</span>
+        }
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (status == AccountStatus.Unverified) {</span>
+<span class="fc" id="L68">            return false;</span>
+        }
+<span class="fc bfc" id="L70" title="All 4 branches covered.">        if (amount &lt;= 0 || amount &gt; balance) {</span>
+<span class="fc" id="L71">            return false;</span>
+        }
+<span class="fc" id="L73">        balance -= amount;</span>
+<span class="fc" id="L74">        return true;</span>
+    }
+    
+    /**
+     * Transfer money to another account
+     * @param recipientCardNumber Recipient's card number
+     * @param amount Amount to transfer
+     * @param description Transfer description
+     * @return true if successful, false otherwise
+     */
+    public boolean transfer(String recipientCardNumber, double amount, String description) {
+<span class="fc bfc" id="L85" title="All 2 branches covered.">        if (status != AccountStatus.Verified) {</span>
+<span class="fc" id="L86">            return false;</span>
+        }
+<span class="fc bfc" id="L88" title="All 4 branches covered.">        if (amount &lt;= 0 || amount &gt; balance) {</span>
+<span class="fc" id="L89">            return false;</span>
+        }
+        
+<span class="fc" id="L92">        Account recipient = AccountDAO.findByCardNumber(recipientCardNumber);</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">        if (recipient == null) {</span>
+<span class="fc" id="L94">            return false;</span>
+        }
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        if (recipient.getStatus() == AccountStatus.Closed) {</span>
+<span class="fc" id="L97">            return false;</span>
+        }
+        
+<span class="fc" id="L100">        this.balance -= amount;</span>
+<span class="fc" id="L101">        recipient.balance += amount;</span>
+<span class="fc" id="L102">        return true;</span>
+    }
+    
+    // State transition methods
+    
+    /**
+     * Verify account (admin action)
+     * @return true if verification successful
+     */
+    public boolean verify() {
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        if (status == AccountStatus.Unverified) {</span>
+<span class="fc" id="L113">            status = AccountStatus.Verified;</span>
+<span class="fc" id="L114">            return true;</span>
+        }
+<span class="fc" id="L116">        return false;</span>
+    }
+    
+    /**
+     * Suspend account due to violation
+     * @return true if suspension successful
+     */
+    public boolean suspend() {
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (status == AccountStatus.Verified) {</span>
+<span class="fc" id="L125">            status = AccountStatus.Suspended;</span>
+<span class="fc" id="L126">            return true;</span>
+        }
+<span class="fc" id="L128">        return false;</span>
+    }
+    
+    /**
+     * Close account (admin action)
+     * @return true if closure successful
+     */
+    public boolean close() {
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (status != AccountStatus.Closed) {</span>
+<span class="fc" id="L137">            status = AccountStatus.Closed;</span>
+<span class="fc" id="L138">            return true;</span>
+        }
+<span class="fc" id="L140">        return false;</span>
+    }
+    
+    /**
+     * Appeal from suspended state
+     * @return true if appeal successful
+     */
+    public boolean appeal() {
+<span class="fc bfc" id="L148" title="All 2 branches covered.">        if (status == AccountStatus.Suspended) {</span>
+<span class="fc" id="L149">            status = AccountStatus.Verified;</span>
+<span class="fc" id="L150">            return true;</span>
+        }
+<span class="fc" id="L152">        return false;</span>
+    }
+    
+    // Getters and Setters
+    
+    public int getId() {
+<span class="fc" id="L158">        return id;</span>
+    }
+    
+    public String getClientName() {
+<span class="fc" id="L162">        return clientName;</span>
+    }
+    
+    public void setClientName(String clientName) {
+<span class="nc" id="L166">        this.clientName = clientName;</span>
+<span class="nc" id="L167">    }</span>
+    
+    public String getCardNumber() {
+<span class="fc" id="L170">        return cardNumber;</span>
+    }
+    
+    public double getBalance() {
+<span class="fc" id="L174">        return balance;</span>
+    }
+    
+    public AccountStatus getStatus() {
+<span class="fc" id="L178">        return status;</span>
+    }
+    
+    public void setStatus(AccountStatus status) {
+<span class="fc" id="L182">        this.status = status;</span>
+<span class="fc" id="L183">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AccountDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Banking System Testing Project</a> &gt; <a href="index.source.html" class="el_package">com.banking.dao</a> &gt; <span class="el_source">AccountDAO.java</span></div><h1>AccountDAO.java</h1><pre class="source lang-java linenums">package com.banking.dao;
+
+import com.banking.entities.Account;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Data Access Object for Account management
+ */
+<span class="nc" id="L10">public class AccountDAO {</span>
+    
+<span class="fc" id="L12">    private static Map&lt;Integer, Account&gt; accounts = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L13">    private static Map&lt;String, Account&gt; cardNumberIndex = new HashMap&lt;&gt;();</span>
+    
+    /**
+     * Add account to storage
+     * @param account Account to add
+     */
+    public static void add(Account account) {
+<span class="fc" id="L20">        accounts.put(account.getId(), account);</span>
+<span class="fc" id="L21">        cardNumberIndex.put(account.getCardNumber(), account);</span>
+<span class="fc" id="L22">    }</span>
+    
+    /**
+     * Find account by ID
+     * @param id Account ID
+     * @return Account or null if not found
+     */
+    public static Account findById(int id) {
+<span class="fc" id="L30">        return accounts.get(id);</span>
+    }
+    
+    /**
+     * Find account by card number
+     * @param cardNumber Card number
+     * @return Account or null if not found
+     */
+    public static Account findByCardNumber(String cardNumber) {
+<span class="fc" id="L39">        return cardNumberIndex.get(cardNumber);</span>
+    }
+    
+    /**
+     * Remove account from storage
+     * @param id Account ID
+     */
+    public static void remove(int id) {
+<span class="nc" id="L47">        Account account = accounts.remove(id);</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (account != null) {</span>
+<span class="nc" id="L49">            cardNumberIndex.remove(account.getCardNumber());</span>
+        }
+<span class="nc" id="L51">    }</span>
+    
+    /**
+     * Clear all accounts (for testing)
+     */
+    public static void clear() {
+<span class="fc" id="L57">        accounts.clear();</span>
+<span class="fc" id="L58">        cardNumberIndex.clear();</span>
+<span class="fc" id="L59">    }</span>
+    
+    /**
+     * Get all accounts count
+     * @return Number of accounts
+     */
+    public static int count() {
+<span class="nc" id="L66">        return accounts.size();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

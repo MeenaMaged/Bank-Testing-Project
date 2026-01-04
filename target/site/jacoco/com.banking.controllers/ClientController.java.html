@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ClientController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Banking System Testing Project</a> &gt; <a href="index.source.html" class="el_package">com.banking.controllers</a> &gt; <span class="el_source">ClientController.java</span></div><h1>ClientController.java</h1><pre class="source lang-java linenums">package com.banking.controllers;
+
+import com.banking.entities.Account;
+import com.banking.services.AccountService;
+import com.banking.services.TransactionService;
+
+/**
+ * Controller for client operations
+ */
+public class ClientController {
+    
+    private final AccountService accountService;
+    private final TransactionService transactionService;
+    
+<span class="nc" id="L15">    public ClientController() {</span>
+<span class="nc" id="L16">        this.accountService = new AccountService();</span>
+<span class="nc" id="L17">        this.transactionService = new TransactionService();</span>
+<span class="nc" id="L18">    }</span>
+    
+<span class="fc" id="L20">    public ClientController(AccountService accountService, TransactionService transactionService) {</span>
+<span class="fc" id="L21">        this.accountService = accountService;</span>
+<span class="fc" id="L22">        this.transactionService = transactionService;</span>
+<span class="fc" id="L23">    }</span>
+    
+    /**
+     * Create new account
+     */
+    public Account createAccount(int id, String clientName, double initialBalance) {
+<span class="fc" id="L29">        return accountService.createAccount(id, clientName, initialBalance);</span>
+    }
+    
+    /**
+     * Process deposit
+     */
+    public String processDeposit(Account account, double amount) {
+<span class="fc" id="L36">        boolean success = transactionService.processDeposit(account, amount);</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        return success ? &quot;Deposit successful&quot; : &quot;Deposit failed&quot;;</span>
+    }
+    
+    /**
+     * Process withdrawal
+     */
+    public String processWithdrawal(Account account, double amount) {
+<span class="fc" id="L44">        boolean success = transactionService.processWithdrawal(account, amount);</span>
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        return success ? &quot;Withdrawal successful&quot; : &quot;Withdrawal failed&quot;;</span>
+    }
+    
+    /**
+     * Process transfer
+     */
+    public String processTransfer(Account sender, String recipientCardNumber, 
+                                  double amount, String description) {
+<span class="fc" id="L53">        boolean success = transactionService.processTransfer(sender, recipientCardNumber, </span>
+                                                             amount, description);
+<span class="pc bpc" id="L55" title="1 of 2 branches missed.">        return success ? &quot;Transfer successful&quot; : &quot;Transfer failed&quot;;</span>
+    }
+    
+    /**
+     * Get account statement
+     */
+    public String getAccountStatement(Account account) {
+<span class="fc" id="L62">        return accountService.generateStatement(account);</span>
+    }
+    
+    /**
+     * Validate operation
+     */
+    public boolean validateOperation(Account account, String operation) {
+<span class="fc" id="L69">        return accountService.isOperationAllowed(account, operation);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>

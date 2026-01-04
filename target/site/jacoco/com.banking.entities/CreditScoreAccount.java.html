@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreditScoreAccount.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Banking System Testing Project</a> &gt; <a href="index.source.html" class="el_package">com.banking.entities</a> &gt; <span class="el_source">CreditScoreAccount.java</span></div><h1>CreditScoreAccount.java</h1><pre class="source lang-java linenums">package com.banking.entities;
+
+/**
+ * Extended Account class with Credit Score feature
+ * This is the GREEN PHASE implementation for TDD
+ */
+public class CreditScoreAccount extends Account {
+    
+    private int creditScore;
+    private int overdraftAttempts;
+    private int successfulTransactions;
+    
+    // Credit score constants
+    private static final int INITIAL_SCORE = 700;
+    private static final int MIN_SCORE = 300;
+    private static final int MAX_SCORE = 850;
+    private static final int DEPOSIT_BONUS = 5;
+    private static final int OVERDRAFT_PENALTY = 20;
+    private static final int SUSPENSION_PENALTY = 50;
+    private static final int APPEAL_RECOVERY = 25;
+    
+    public CreditScoreAccount(int id, String clientName, double initialBalance) {
+<span class="fc" id="L23">        super(id, clientName, initialBalance);</span>
+<span class="fc" id="L24">        this.creditScore = INITIAL_SCORE;</span>
+<span class="fc" id="L25">        this.overdraftAttempts = 0;</span>
+<span class="fc" id="L26">        this.successfulTransactions = 0;</span>
+<span class="fc" id="L27">    }</span>
+    
+    /**
+     * Get current credit score
+     * @return Credit score (300-850)
+     */
+    public int getCreditScore() {
+<span class="fc" id="L34">        return creditScore;</span>
+    }
+    
+    /**
+     * Get transaction limit based on credit score
+     * @return Maximum allowed transaction amount
+     */
+    public double getTransactionLimit() {
+        // Higher credit score = higher limit
+        // Score 700 = $7000 limit
+<span class="fc" id="L44">        return creditScore * 10.0;</span>
+    }
+    
+    /**
+     * Deposit with credit score update
+     */
+    @Override
+    public boolean deposit(double amount) {
+<span class="fc" id="L52">        boolean result = super.deposit(amount);</span>
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">        if (result) {</span>
+<span class="fc" id="L54">            successfulTransactions++;</span>
+            // Improve credit score for successful deposits
+<span class="fc bfc" id="L56" title="All 2 branches covered.">            if (successfulTransactions % 3 == 0) {</span>
+<span class="fc" id="L57">                adjustCreditScore(DEPOSIT_BONUS);</span>
+            }
+        }
+<span class="fc" id="L60">        return result;</span>
+    }
+    
+    /**
+     * Withdraw with credit score check
+     */
+    @Override
+    public boolean withdraw(double amount) {
+        // Check credit-based limit
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        if (amount &gt; getTransactionLimit()) {</span>
+<span class="fc" id="L70">            return false;</span>
+        }
+        
+<span class="fc" id="L73">        boolean result = super.withdraw(amount);</span>
+<span class="pc bpc" id="L74" title="1 of 4 branches missed.">        if (!result &amp;&amp; amount &gt; getBalance()) {</span>
+            // Overdraft attempt - penalize credit score
+<span class="fc" id="L76">            overdraftAttempts++;</span>
+<span class="fc" id="L77">            adjustCreditScore(-OVERDRAFT_PENALTY);</span>
+<span class="pc bpc" id="L78" title="1 of 2 branches missed.">        } else if (result) {</span>
+<span class="fc" id="L79">            successfulTransactions++;</span>
+        }
+<span class="fc" id="L81">        return result;</span>
+    }
+    
+    /**
+     * Withdraw with explicit credit check
+     * @param amount Amount to withdraw
+     * @return true if successful
+     */
+    public boolean withdrawWithCreditCheck(double amount) {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (amount &gt; getTransactionLimit()) {</span>
+<span class="fc" id="L91">            return false;</span>
+        }
+<span class="fc" id="L93">        return withdraw(amount);</span>
+    }
+    
+    /**
+     * Suspend account with credit score penalty
+     */
+    @Override
+    public boolean suspend() {
+<span class="fc" id="L101">        boolean result = super.suspend();</span>
+<span class="pc bpc" id="L102" title="1 of 2 branches missed.">        if (result) {</span>
+<span class="fc" id="L103">            adjustCreditScore(-SUSPENSION_PENALTY);</span>
+        }
+<span class="fc" id="L105">        return result;</span>
+    }
+    
+    /**
+     * Appeal with partial credit score recovery
+     */
+    @Override
+    public boolean appeal() {
+<span class="fc" id="L113">        boolean result = super.appeal();</span>
+<span class="pc bpc" id="L114" title="1 of 2 branches missed.">        if (result) {</span>
+<span class="fc" id="L115">            adjustCreditScore(APPEAL_RECOVERY);</span>
+        }
+<span class="fc" id="L117">        return result;</span>
+    }
+    
+    /**
+     * Adjust credit score within bounds
+     */
+    private void adjustCreditScore(int adjustment) {
+<span class="fc" id="L124">        creditScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, creditScore + adjustment));</span>
+<span class="fc" id="L125">    }</span>
+    
+    /**
+     * Calculate credit score based on account factors
+     * This is a more sophisticated calculation for the REFACTOR phase
+     */
+    public void recalculateCreditScore() {
+<span class="fc" id="L132">        int baseScore = INITIAL_SCORE;</span>
+        
+        // Balance factor (higher balance = better score)
+<span class="fc bfc" id="L135" title="All 2 branches covered.">        if (getBalance() &gt; 5000) {</span>
+<span class="fc" id="L136">            baseScore += 50;</span>
+<span class="pc bpc" id="L137" title="1 of 2 branches missed.">        } else if (getBalance() &gt; 1000) {</span>
+<span class="fc" id="L138">            baseScore += 25;</span>
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        } else if (getBalance() &lt; 100) {</span>
+<span class="nc" id="L140">            baseScore -= 25;</span>
+        }
+        
+        // Transaction history factor
+<span class="fc" id="L144">        baseScore += (successfulTransactions * 2);</span>
+<span class="fc" id="L145">        baseScore -= (overdraftAttempts * 10);</span>
+        
+        // Status factor
+<span class="pc bpc" id="L148" title="3 of 4 branches missed.">        switch (getStatus()) {</span>
+            case Verified:
+<span class="fc" id="L150">                baseScore += 10;</span>
+<span class="fc" id="L151">                break;</span>
+            case Suspended:
+<span class="nc" id="L153">                baseScore -= 30;</span>
+<span class="nc" id="L154">                break;</span>
+            case Closed:
+<span class="nc" id="L156">                baseScore -= 50;</span>
+<span class="nc" id="L157">                break;</span>
+            default:
+                break;
+        }
+        
+<span class="fc" id="L162">        creditScore = Math.max(MIN_SCORE, Math.min(MAX_SCORE, baseScore));</span>
+<span class="fc" id="L163">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.10.202304240956</span></div></body></html>
