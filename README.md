@@ -13,6 +13,9 @@ This project implements comprehensive testing for a simplified banking software 
 - **Meena Maged Abdo Mekhaiel** - ID: 1900694
 - **Muhammad Yassin Hassan Mohy Eldeen** - ID: 23P0394
 
+### Repository
+🔗 **GitHub**: [https://github.com/MeenaMaged/Bank-Testing-Project]
+
 ---
 
 ## Project Structure
